@@ -1,3 +1,4 @@
+%% Binary classifier 2D
 load fisheriris
 
 % Database creation
@@ -7,8 +8,7 @@ Y(1:50,:) = 1; % setosa
 Y(51:100,:) = 2; % versicolor
 Y(101:150,:) = 3; % virginica
 
-%% SVM: fitcsvm, fitcecoc
-%% *Part 1: Binary classification*
+%% SVM: fitcsvm
 % Classification between setosa and versicolor. Will only use
 % characteristics 3 and 4
 % _Step 1: Remove virginica from database_
@@ -90,9 +90,13 @@ label = predict(SVMModel,Xv1Test);
 
 TP = C(1,1); FP = C(2,1); FN = C(1,2); TN = C(2,2);
 All = TP + TN; P = TP + FN; N = FP + TN; Pp = TP + FP; Np = FN + TN;
-%% Neural Networks: feedforwardnet
+Accuracy = (TP+TN)/All;
+ErrorRate = (FP+FN)/All;
+Sensitivity = TP/P;
+Specificity = TN/N;
+Precision = TP/(TP+FP);
+Recall = TP/(TP+FP);
+FScore = (2*Precision*Recall)/(Precision+Recall);
 
-%% Performance: Confusiomat
-% Binary classification
-% Multiclass classification
-% Cross-validation
+Mperformance = table(Accuracy, ErrorRate, Sensitivity, Specificity, Precision,...
+    Recall, FScore);
