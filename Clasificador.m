@@ -1,7 +1,7 @@
 %% Dictionary
 % Binary classification: SVM->fitcsvm
 
-% Multiclass classification: SVM->fitcecoc ; Neural Networks->feedforwardnet
+% Multiclass classification: SVM, Nearest neighbour->fitcecoc ; Neural Networks->feedforwardnet
 
 % Classifier Performance: confusion matrix -> Confusiomat ; Data partition
 % -> cvpartition ; Cross validation -> crossval

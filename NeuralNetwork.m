@@ -1,4 +1,4 @@
-%% Multiclass classifier with kernel
+%% Neural Network implementation
 load fisheriris
 
 % Database creation
@@ -24,17 +24,16 @@ Yv1Train = Yv1(~TestP,:);
 Xv1Test = Xv1(TestP,:);
 Yv1Test = Yv1(TestP,:);
 
-% _Step 3: Implement classifier using fitcecoc_
-t = templateSVM('KernelFunction','gaussian');
-Model = fitcecoc(Xv1Train,Yv1Train,'Learners',t,'Coding','onevsall'); % One vs. One
-% Model = fitcecoc(Xv1Train,Yv1Train,'Coding','onevsall'); % One vs. All
-
-% t = templateKNN('NumNeighbors',5,'Standardize',1); % Nearest Neighbor
-% Model = fitcecoc(Xv1Train,Yv1Train,'Learners',t);
+% _Step 3: Implement classifier using feedforwardnet_
+net = feedforwardnet(2);
+[net, tr] = train(net,Xv1Test,Yv1Test);
+view(net)
+% y = net();
+% perf = perform(net,y,t)
 
 
 % _Step 4: Obtain performance of classifier_
-label = predict(Model,Xv1Test);
+label = predict(SVMModel,Xv1Test);
 % Confusion matrix generation
 [C, ~] = confusionmat(Yv1Test,label);
 Cm = confusionchart(Yv1Test,label);
