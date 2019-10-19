@@ -4,7 +4,7 @@
 % Multiclass classification: SVM->fitcecoc ; Neural Networks->feedforwardnet
 
 % Classifier Performance: confusion matrix -> Confusiomat ; Data partition
-% -> cvpartition
+% -> cvpartition ; Cross validation -> crossval
 
 % +------------------------------+---------------------------------------+----------------------+-----+
 % |                              | C1                                    | C2                   |     |
