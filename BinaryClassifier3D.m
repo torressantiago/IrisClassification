@@ -17,7 +17,7 @@ Xv1 = meas(inds,2:4);
 Yv1 = Y(inds,:);
 
 % _Step 2: Partition resulting database for cross-validation purposes_
-Partition = cvpartition(Yv1,'Holdout',70/100);
+Partition = cvpartition(Yv1,'Holdout',30/100);
 TestP = Partition.test;
 % Train set
 Xv1Train = Xv1(~TestP,:);
