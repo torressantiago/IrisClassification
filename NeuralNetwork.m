@@ -8,11 +8,10 @@ Y(1:50,:) = 1; % setosa
 Y(51:100,:) = 2; % versicolor
 Y(101:150,:) = 3; % virginica
 
-%% SVM: fitcsvm
-% Classification between versicolor and virginica.
-% _Step 1: Create database for problem
+%% NN: feedforwardnet
+% _Step 1: Create database for problem_
 Xv1 = meas;
-Yv1 = species;
+Yv1 = Y;
 
 % _Step 2: Partition resulting database for cross-validation purposes_
 Partition = cvpartition(Yv1,'Holdout',50/100);
@@ -25,31 +24,18 @@ Xv1Test = Xv1(TestP,:);
 Yv1Test = Yv1(TestP,:);
 
 % _Step 3: Implement classifier using feedforwardnet_
-net = feedforwardnet(2);
-[net, tr] = train(net,Xv1Test,Yv1Test);
-view(net)
-% y = net();
-% perf = perform(net,y,t)
+net = feedforwardnet([ 8 8 ]);
 
+net.trainParam.epochs = 1000;
+
+[net, tr] = train(net,Xv1Train',Yv1Train');
+view(net)
 
 % _Step 4: Obtain performance of classifier_
-label = predict(SVMModel,Xv1Test);
+label = net(Xv1Test');
+label = label';
+labela(label < 1.5 & label >= 0.5) = 1;
+labela(label < 2.5 & label >= 1.5) = 2;
+labela(label < 3.5 & label >= 2.5) = 3;
 % Confusion matrix generation
-[C, ~] = confusionmat(Yv1Test,label);
-Cm = confusionchart(Yv1Test,label);
-
-% These values hold for a 2x2 matrix confusion. In order to observe the
-% performance of a certain characteristic given the characteristic itself
-% or another one, the calculations must be adjusted.
-TP = C(1,1); FP = C(2,1); FN = C(1,2); TN = C(2,2);
-All = TP + TN; P = TP + FN; N = FP + TN; Pp = TP + FP; Np = FN + TN;
-Accuracy = (TP+TN)/All;
-ErrorRate = (FP+FN)/All;
-Sensitivity = TP/P;
-Specificity = TN/N;
-Precision = TP/(TP+FP);
-Recall = TP/(TP+FP);
-FScore = (2*Precision*Recall)/(Precision+Recall);
-
-Mperformance = table(Accuracy, ErrorRate, Sensitivity, Specificity, Precision,...
-    Recall, FScore);
+[C, ~] = confusionmat(Yv1Test,labela);
