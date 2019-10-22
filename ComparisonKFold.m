@@ -1,4 +1,4 @@
-%% Multiclass classifier with kernel / Doing Cross validationTechniqueg
+%% Comparison in between cases using cross validation separation mehtod
 load fisheriris
 
 % Database creation
@@ -15,7 +15,7 @@ Xv1 = meas;
 Yv1 = species;
 
 % _Step 2: Partition resulting database for cross-validation purposes_
-Partition = cvpartition(Yv1,'kFold',3);
+Partition = cvpartition(Yv1,'Holdout',30/100);
 TestP = Partition.test;
 % Train set
 Xv1Train = Xv1(~TestP,:);
@@ -27,14 +27,13 @@ Yv1Test = Yv1(TestP,:);
 % _Step 3: Implement classifier using fitcecoc_
 t = templateSVM('KernelFunction','gaussian');
 Model = fitcecoc(Xv1Train,Yv1Train,'Learners',t,'Coding','onevsall'); % One vs. One
-% Model = fitcecoc(Xv1Train,Yv1Train,'Coding','onevsall'); % One vs. All
 
-% t = templateKNN('NumNeighbors',5,'Standardize',1); % Nearest Neighbor
-% Model = fitcecoc(Xv1Train,Yv1Train,'Learners',t);
+CVSVMModel = crossval(Model);
 
+FirstModel = CVSVMModel.Trained{4};
 
 % _Step 4: Obtain performance of classifier_
-label = predict(Model,Xv1Test);
+label = predict(FirstModel,Xv1Test);
 % Confusion matrix generation
 [C, ~] = confusionmat(Yv1Test,label);
 Cm = confusionchart(Yv1Test,label);

@@ -1,4 +1,4 @@
-%% Comparison in between cases%% 
+%% Comparison in between cases using holdout separation mehtod
 load fisheriris
 
 % Database creation
@@ -12,7 +12,7 @@ Y(101:150,:) = 3; % virginica
 Xv1 = meas;
 Yv1 = Y;
 
-% _Step 2: Partition resulting database for cross-validation purposes_
+% _Step 2: Partition resulting database for SVM classification_
 Partition = cvpartition(Yv1,'Holdout',30/100);
 TestP = Partition.test;
 % Train set
@@ -22,26 +22,64 @@ Yv1Train = Yv1(~TestP,:);
 Xv1Test = Xv1(TestP,:);
 Yv1Test = Yv1(TestP,:);
 
+% _Step 3: Partition resulting database for ANN classification_
+% New Y definition
+YNN = ones(150,3);
+
+YNN(1:100,1) = zeros(100,1);
+YNN(1:50,2) = zeros(50,1);
+YNN(101:150,2) = zeros(50,1);
+YNN(51:150,3) = zeros(100,1);
+
+% Train set
+Yv2Train = YNN(~TestP,:);
+% Test set
+Yv2Test = YNN(TestP,:);
+Yv2Testa = Yv1(TestP,:);
 %% NN: feedforwardnet
 % _Step 1: Implement classifier using feedforwardnet_
-net = feedforwardnet([ 8 8 ]);
+net = feedforwardnet([8 8]);
 
 net.trainParam.epochs = 1000;
 
-[net, tr] = train(net,Xv1Train',Yv1Train');
+[net, tr] = train(net,Xv1Train',Yv2Train');
 view(net)
 
-% _Step 2: Obtain performance of classifier_
+% _Step 2: Obtain classifier performance_
 label = net(Xv1Test');
 label = label';
-labela(label < 1.5 & label >= 0.5) = 1;
-labela(label < 2.5 & label >= 1.5) = 2;
-labela(label < 3.5 & label >= 2.5) = 3;
+labela = label;
+labelb = ones(45,1);
+
+for i = 1:45
+    for j = 1:3
+        if labela(i,j) < 0.5
+            labela(i,j) = 0;
+        else
+            labela(i,j) = 1;
+        end
+    end
+end
+
+LUT = [0,0,0 ; 0,0,1 ; 0,1,0 ; 0,1,1 ; 1,0,0 ; 1,0,1 ; 1,1,0 ; 1,1,1];
+
+for i = 1:45
+    if isequal(labela(i,:), LUT(1,:)) || isequal(labela(i,:), LUT(2,:))
+        labelb(i) = 1;
+    elseif isequal(labela(i,:), LUT(3,:)) || isequal(labela(i,:), LUT(4,:))
+        labelb(i) = 2;
+    elseif isequal(labela(i,:), LUT(5,:)) || isequal(labela(i,:), LUT(6,:))
+        labelb(i) = 3;
+    else 
+        labelb(i) = 4;
+    end
+end
+
 % Confusion matrix generation
-[CNN, ~] = confusionmat(Yv1Test,labela);
+[CNN, ~] = confusionmat(Yv2Testa,labelb);
 figure
 title('Confusion chart for ANN')
-cm = confusionchart(Yv1Test,labela);
+cm = confusionchart(Yv2Testa,labelb);
 cm.ColumnSummary = 'column-normalized';
 cm.RowSummary = 'row-normalized';
 cm.Title = 'Confusion chart for ANN';
